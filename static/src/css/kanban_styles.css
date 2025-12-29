@@ -1,0 +1,12 @@
+
+.oe_kanban_global_click.oe_state_en_cours {
+    background-color: #98ed76 !important; 
+}
+
+.oe_kanban_global_click.oe_state_pas_encore {
+    background-color: #5ebceb !important; 
+}
+
+.oe_kanban_global_click.oe_state_termine {
+    background-color: #f87c7c !important; 
+}

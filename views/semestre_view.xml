@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- tree view-->
+    <record id="semestre_tree" model="ir.ui.view">
+        <field name="name">semestre.tree</field>
+        <field name="model">semestre</field>
+        <field name="arch" type="xml">
+            <tree sample="1" multi_edit="1">
+                <field name="apprenti_id" optional="show" />
+                <field name="semestre_type" optional="show" />
+                <field name="state" optional="show" decoration-success=" state == 'en_cours' "
+                    decoration-info="state == 'pas_encore'" decoration-danger="state == 'termine'"
+                    widget="badge" />
+                <field name="annee_scolaire" optional="show" />
+                <field name="debut_semestre" optional="show" />
+                <field name="fin_semestre" optional="show" />
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- form view -->
+    <record id="view_semestre_form" model="ir.ui.view">
+        <field name="name">semestre.form</field>
+        <field name="model">semestre</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="pas_encore,en_cours,termine" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="semestre_type" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Information de semestre">
+                            <field name="apprenti_id"
+                                readonly="context.get('apprenti_readonly', False)" />
+                            <field name="semestre_type" />
+                            <field name="annee_scolaire" placeholder="ex: 2024/2025" maxlength="9" />
+                            <field name="debut_semestre" />
+                            <field name="fin_semestre" />
+                            <field name="remuneration_maitre" widget="monetary" />
+                        </group>
+                        <group string="Documentation">
+                            <field name="certificat_scolaire" />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Payement">
+                            <field name="list_mois_ids">
+                                <tree>
+                                    <field name="mois" />
+                                    <field name="montant" widget="monetary" />
+                                    <field name="remuneration_maitre" widget="monetary" />
+                                    <button name="action_open_wizard"
+                                        type="object"
+                                        string="modifier"
+                                        class="btn-primary" />
+                                    
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Action-->
+    <record id="semestre_action" model="ir.actions.act_window">
+        <field name="name">Semestres</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">semestre</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajoutez un semestre
+            </p>
+        </field>
+    </record>
+
+
+    <!-- Menu -->
+    <menuitem
+        id="menu_semestre"
+        name="Semestres"
+        parent="menu_apprentissage_root"
+        action="semestre_action"
+        sequence="10" />
+</odoo>

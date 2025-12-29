@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_structure,access.structure,model_structure,,1,1,1,1
+access_department,access.department,model_department,,1,1,1,1
+access_station,access.station,model_station,,1,1,1,1
+access_etablissement,access.etablissement,model_etablissement,,1,1,1,1
+access_employe,access.employe,model_employe,,1,1,1,1
+access_apprenti,access.apprenti,model_apprenti,,1,1,1,1
+access_semestre,access.semestre,model_semestre,,1,1,1,1
+access_semestre_mois,access.semestre.mois,model_semestre_mois,,1,1,1,1
+access_edit_montant_mois_wizard,access.edit.montant.mois.wizard,model_edit_montant_mois_wizard,,1,1,1,1
+access_apprenti_report_wizard,access.apprenti.report.wizard,model_apprenti_report_wizard,,1,1,1,1

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="action_report_apprenti_xlsx" model="ir.actions.report">
+        <field name="name">Print to XLSX</field>
+        <field name="model">apprenti</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">apprenti.apprenti_xlsx_report</field>
+        <field name="report_file">Etat_Apprentis</field>
+        <field name="binding_model_id" ref="model_apprenti" />
+        <field name="binding_type">report</field>
+        <!-- <field name="paperformat_id" eval="False"/> -->
+    </record>
+
+</odoo>

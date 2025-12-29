@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- action -->
+    <record id="employe_action" model="ir.actions.act_window">
+        <field name="name">employe</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">employe</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first employe
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_employe"
+        name="employe"
+        action="employe_action"
+        parent="menu_other_root"
+        sequence="10"/>
+
+</odoo>

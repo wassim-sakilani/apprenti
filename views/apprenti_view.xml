@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 
+    <template id="assets_backend" name="apprenti assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/css" href="/apprenti/static/src/css/kanban_styles.css" />
+        </xpath>
+    </template>
+-->
+    <!-- search view -->
+    <record id="apprenti_search" model="ir.ui.view">
+        <field name="name">apprenti.search</field>
+        <field name="model">apprenti</field>
+        <field name="arch" type="xml">
+            <search string="Search Modules">
+                <field name="nom" />
+                <field name="prenom" />
+                <field name="matricule" />
+                <field name="semestre_ids" />
+                <field name="maitre_id" />
+                <field name="num_contrat" />
+                <separator />
+
+                <!-- filter -->
+                <filter name="state" string="Ouvert" domain="[('state', '=', 'pas_encore')]" />
+                <filter name="state" string="En Cours" domain="[('state', '=', 'en_cours')]" />
+                <filter name="state" string="Terminé" domain="[('state', '=', 'termine')]" />
+
+                <!-- trier -->
+                <group expand="1" string="Group By">
+                    <filter name="state" string="State" context="{'group_by': 'state'}" />
+                    <filter name="semestre_ids" string="Semestre"
+                        context="{'group_by': 'semestre_ids'}" />
+                    <filter name="structure_id" string="Structure"
+                        context="{'group_by': 'structure_id'}" />
+                    <filter name="department_id" string="Department"
+                        context="{'group_by': 'department_id'}" />
+                    <filter name="station_id" string="Station" context="{'group_by': 'station_id'}" />
+                </group>
+                <searchpanel>
+                    <field name="state" string="State" enable_counters="1" />
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!--kanban
+    view -->
+
+    <record id="apprenti_view_kanban" model="ir.ui.view">
+        <field name="name">apprenti.view.kanban</field>
+        <field name="model">apprenti</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id" />
+                <field name="image_128" />
+                <field name="matricule" readonly="1" />
+                <field name="prenom" />
+                <field name="nom" />
+                <field name="email" />
+                <field name="telephone" />
+                <field name="state" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div
+                            t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill o_hr_kanban_record">
+
+                            <div
+                                t-attf-class="h-100 #{record.state.raw_value == 'en_cours' ? 'bg-success' : record.state.raw_value == 'termine' ? 'bg-danger' : 'bg-info'}"
+                                style="width: 3px; position: absolute; right: 0; top: 0; bottom: 0;" />
+                            <div class="o_kanban_image_fill_left d-none d-md-block"
+                                t-attf-style="background-image: url(#{kanban_image('apprenti', 'image_128', record.id.raw_value)})"
+                                role="img" />
+
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+
+                                        <strong class="text-muted o_kanban_record_title">
+                                            <i class="fa fa-id-card-o mr-1 " />
+                                            <field name="matricule" />
+                                        </strong>
+
+                                        <div class=" mt-2">
+                                            <field name="prenom" />
+                                            <field name="nom" />
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <ul>
+                                    <li t-if="record.email.raw_value">
+                                        <i class="fa fa-envelope mr-2" title="Email" />
+                                        <field name="email" widget="email" />
+                                    </li>
+                                    <li t-if="record.telephone.raw_value">
+                                        <i class="fa fa-phone mr-2" title="Phone" />
+                                        <field name="telephone" widget="phone" />
+                                    </li>
+                                </ul>
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                            decoration-info="state == 'pas_encore'"
+                                            decoration-success="state == 'en_cours'"
+                                            decoration-danger="state == 'termine'" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+
+            </kanban>
+        </field>
+    </record>
+
+
+    <!-- tree view-->
+
+    <record id="apprenti_tree" model="ir.ui.view">
+        <field name="name">apprenti.tree</field>
+        <field name="model">apprenti</field>
+        <field name="arch" type="xml">
+            <tree sample="1" multi_edit="1" default_order="matricule desc">
+                <field name="matricule" optional="show" />
+                <field name="prenom" optional="show" />
+                <field name="nom" optional="show" />
+                <field name="state" optional="show" decoration-info="state == 'pas_encore'"
+                    decoration-success=" state == 'en_cours' "
+                    decoration-danger="state == 'termine'"
+                    widget="badge" />
+                <field name="date_naiss" optional="hide" />
+                <field name="lieu_naiss" optional="hide" />
+                <field name="telephone" optional="hide" widget="phone" />
+                <field name="email" optional="hide" widget="email" />
+                <field name="adress" optional="hide" />
+                <field name="etablissement_id" optional="hide" />
+                <field name="structure_id" optional="show" />
+                <field name="department_id" optional="show" />
+                <field name="station_id" optional="show" />
+                <field name="maitre_id" optional="hide" />
+                <field name="semestre_display" optional="hide" />
+                <field name="debut_apprendre" optional="show" />
+                <field name="fin_apprendre" optional="show" />
+                <field name="speciality" optional="hide" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- form view -->
+    <record id="view_apprenti_form" model="ir.ui.view">
+        <field name="name">apprenti.form</field>
+        <field name="model">apprenti</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="pas_encore,en_cours,termine" />
+                </header>
+                <sheet> <!-- 
+                    <widget name="web_ribbon" title="Terminé" bg_color="bg-danger"
+                    attrs="{'invisible' : [('state' , '=','pas_encore'),('state','=','en_cours')]}" /> -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_semestre" type="object"
+                            class="oe_stat_button" icon="fa-plus">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Semestre</span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"
+                        options="{'preview_image': 'image_128'}" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="matricule" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Information Personnelles">
+                            <field name="prenom" />
+                            <field name="nom" />
+                            <field name="date_naiss" />
+                            <field name="lieu_naiss" />
+                            <field name="telephone" widget="phone" />
+                            <field name="email" widget="email" />
+                            <field name="adress" />
+                        </group>
+                        <group string="Formation">
+                            <field name="etablissement_id" />
+                            <field name="speciality" />
+                            <field name="structure_id" />
+                            <field name="department_id" />
+                            <field name="station_id" />
+                            <field name="maitre_id" />
+                            <field name="debut_apprendre" />
+                            <field name="fin_apprendre" />
+
+                        </group>
+                        <group string="Document">
+                            <field name="num_contrat" />
+                            <field name="pv_installation" />
+                            <field name="contrat" />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="semestre_ids" string="Les Semestres">
+                            <field name="semestre_ids">
+                                <tree>
+                                    <field name="semestre_type" />
+                                    <field name="debut_semestre" />
+                                    <field name="fin_semestre" />
+                                    <field name="state" decoration-success=" state == 'en_cours' "
+                                        decoration-info="state == 'pas_encore'"
+                                        decoration-danger="state == 'termine'" widget="badge" />
+                                    <field name="montant_semestre" />
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Action-->
+    <record id="apprenti_action" model="ir.actions.act_window">
+        <field name="name">Apprentis</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">apprenti</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajoutez votre premier apprenti
+            </p>
+        </field>
+    </record>
+
+
+    <!-- Menu -->
+
+    <menuitem
+        id="menu_apprentissage_root"
+        name="Apprentissage"
+        sequence="10" />
+
+    <menuitem
+        id="menu_apprenti_root"
+        name="Apprentis"
+        parent="menu_apprentissage_root"
+        sequence="10" />
+
+    <menuitem
+        id="menu_apprenti"
+        name="Apprentis"
+        action="apprenti_action"
+        parent="menu_apprenti_root"
+        sequence="9" />
+
+    <menuitem
+        id="menu_other_root"
+        name="Others"
+        parent="menu_apprentissage_root"
+        sequence="11" />
+
+</odoo>
