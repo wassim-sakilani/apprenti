@@ -62,6 +62,6 @@ This module is essential for HR departments dealing with vocational training con
 
 3. Set the value (Default is 20,000 DZD).
 
-🤝 Contribution
+### 🤝 Contribution
 Contributions are welcome! Please fork the repository and submit a pull request.
 
