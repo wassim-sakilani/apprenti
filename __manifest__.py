@@ -15,8 +15,6 @@
         "views/structure_view.xml",
         "views/semestre_view.xml",
         "views/apprenti_view.xml",
-        "views/department_view.xml",
-        "views/employe_view.xml",
         "views/etablissement_view.xml",
         "views/station_view.xml",
         "views/configuration_view.xml",
