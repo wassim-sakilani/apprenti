@@ -1,7 +1,9 @@
 from odoo import api, models, fields,_
 from odoo.exceptions import UserError
 
-class station(models.Model):
+
+#we have added this module just for testing
+class Station(models.Model):
     _name = "station"
 
     _description = "station de l'ADC"

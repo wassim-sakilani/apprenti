@@ -1,5 +1,7 @@
 from odoo import api, fields, models
 
+
+#The SMIG represents the basic wage, which we will use to calculate the amounts
 class Configuration(models.TransientModel):
     _inherit = 'res.config.settings'
 

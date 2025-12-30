@@ -1,7 +1,7 @@
 from odoo import api, models, fields,_
 from odoo.exceptions import UserError
 from datetime import date
-class apprenti(models.Model):
+class Apprenti(models.Model):
     _name = "apprenti"
     
     _inherit = ['mail.thread','image.mixin']
@@ -75,7 +75,7 @@ class apprenti(models.Model):
     def create(self,vals):
         if vals.get('matricule', _('Nouveau')) == _('Nouveau'):
             vals['matricule'] = self.env['ir.sequence'].next_by_code('apprenti') or _('Nouveau') 
-        return super(apprenti,self).create(vals)
+        return super(Apprenti,self).create(vals)
     
     def action_open_semestre(self):
         self.ensure_one()

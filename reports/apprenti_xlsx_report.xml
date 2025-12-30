@@ -3,7 +3,7 @@
 
 
     <record id="action_report_apprenti_xlsx" model="ir.actions.report">
-        <field name="name">Print to XLSX</field>
+        <field name="name">Etat Apprentis</field>
         <field name="model">apprenti</field>
         <field name="report_type">xlsx</field>
         <field name="report_name">apprenti.apprenti_xlsx_report</field>

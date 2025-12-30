@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-class semestre(models.Model):
+class Semestre(models.Model):
     _name = "semestre"
     _inherit = "mail.thread"
     _rec_name ="semestre_type"  
@@ -19,6 +19,15 @@ class semestre(models.Model):
         ('s5','S5'),
         ('s6','S6')
     ],required=True)
+
+    SEMESTRE_RATES = {
+        's1': 0.2,
+        's2': 0.3,
+        's3': 0.5,
+        's4': 0.5,
+        's5': 0.6,
+        's6': 0.8,
+    }
 
     annee_scolaire = fields.Char(string="Année Scolaire",required=True,help="Format: YYYY/YYYY (ex: 2024/2025)")
 
@@ -54,13 +63,13 @@ class semestre(models.Model):
 
     @api.model
     def create(self, vals):
-        record = super(semestre, self).create(vals)
+        record = super(Semestre, self).create(vals)
         
         record.calcul_mois()
         return record
     
     def write(self, vals):
-        res = super(semestre, self).write(vals)
+        res = super(Semestre, self).write(vals)
         if 'debut_semestre' in vals or 'fin_semestre' in vals or 'semestre_type' in vals:
             self.calcul_montant() 
             self.calcul_mois()
@@ -69,27 +78,15 @@ class semestre(models.Model):
     #methode pour calculer le montant mensuelle
     @api.depends('semestre_type')
     def calcul_montant(self):
-        smig = int(self.env['ir.config_parameter'].sudo().get_param('apprenti.smig', default=20000))
+        smig_param = int(self.env['ir.config_parameter'].sudo().get_param('apprenti.smig', default=20000))
+        smig =float(smig_param)
         for rec in self:
-            #rec.montant_mois = 0
             rec.montant_semestre = 0
             if rec.semestre_type:
-                if rec.semestre_type == "s1" :
-                    precentage = 0.2
-                elif rec.semestre_type == "s2" :
-                    precentage = 0.3
-                elif rec.semestre_type == "s3" :
-                    precentage = 0.5
-                elif rec.semestre_type == "s4" :
-                    precentage = 0.5
-                elif rec.semestre_type == "s5" :
-                    precentage = 0.6
-                elif rec.semestre_type == "s6" :
-                    precentage = 0.8
-                else :
-                    raise UserError("Error when define the value precentage")
-                #rec.montant_mois = precentage * smig
-                rec.montant_semestre = precentage * smig
+                percentage = self.SEMESTRE_RATES.get(rec.semestre_type, 0.0)
+                rec.montant_semestre = percentage * smig
+            else:
+                rec.montant_semestre = 0
 
 
     #methode pour calculer les mois dans un semestre
@@ -99,14 +96,17 @@ class semestre(models.Model):
             if rec.debut_semestre and rec.fin_semestre :
                 start = rec.debut_semestre.replace(day=1)
                 end = rec.fin_semestre.replace(day=1)
+                mois_vals = []
                 while start <= end:
-                    self.env['semestre.mois'].create({
+                    mois_vals.append({
                         'semestre_id': rec.id,
                         'mois': start.strftime('%B'),
                         'montant': rec.montant_semestre,
-                        'remuneration_maitre':rec.remuneration_maitre,
+                        'remuneration_maitre': rec.remuneration_maitre,
                     })
                     start += relativedelta(months=1)
+                if mois_vals:
+                    self.env['semestre.mois'].create(mois_vals)
 
     #methode pour vérifier la durée de semestre s'il depasse 6 mois
     @api.constrains('debut_semestre', 'fin_semestre')
@@ -188,10 +188,10 @@ class semestre(models.Model):
                         f"pour l'année scolaire {rec.annee_scolaire}."
                     )
 
-#######################################################################################
-#   cette module représente les mois dans un semestre,Pour nous permettre de          #
-#         stocker les montant de l'apprenti et aussi la maitre                        #
-#######################################################################################
+########################################################################################
+#   This module represents the months in a semester,                                   #
+#   allowing us to store the apprentice's and master's amounts.                        #
+########################################################################################
 
 class SemestreMois(models.Model):
     _name = "semestre.mois"
