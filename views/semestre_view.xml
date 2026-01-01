@@ -1,20 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- search view -->
+    <record id="semestre_search" model="ir.ui.view">
+        <field name="name">semestre.search</field>
+        <field name="model">semestre</field>
+        <field name="arch" type="xml">
+            <search string="Search Modules">
+                <field name="nom_prenom" />
+                <field name="annee_scolaire" />
+                <field name="state" />
+                <field name="semestre_type" />
+
+                <separator />
+
+                <!-- filter -->
+                <filter name="state_pas_encore" string="Ouvert"
+                    domain="[('state', '=', 'pas_encore')]" />
+                <filter name="state_en_cours" string="En Cours"
+                    domain="[('state', '=', 'en_cours')]" />
+                <filter name="state_termine" string="Terminé" domain="[('state', '=', 'termine')]" />
+
+                <!-- trier -->
+                <group expand="1" string="Group By">
+                    <filter name="state" string="State" context="{'group_by': 'state'}" />
+                    <filter name="semestre_type" string="Semestre"
+                        context="{'group_by': 'semestre_type'}" />
+
+                    <filter name="annee_scolaire" string="Année Scolaire"
+                        context="{'group_by': 'annee_scolaire'}" />
+                </group>
+
+            </search>
+        </field>
+    </record>
+
     <!-- tree view-->
     <record id="semestre_tree" model="ir.ui.view">
         <field name="name">semestre.tree</field>
         <field name="model">semestre</field>
         <field name="arch" type="xml">
             <tree sample="1" multi_edit="1">
-                <field name="apprenti_id" optional="show" />
+                <field name="apprenti_id" optional="hide" />
+                <field name="nom_prenom" optional="show" />
                 <field name="semestre_type" optional="show" />
-                <field name="state" optional="show" decoration-success=" state == 'en_cours' "
-                    decoration-info="state == 'pas_encore'" decoration-danger="state == 'termine'"
-                    widget="badge" />
+
                 <field name="annee_scolaire" optional="show" />
                 <field name="debut_semestre" optional="show" />
                 <field name="fin_semestre" optional="show" />
+                <field name="montant_semestre" optional="show" sum="Total Montant" />
+                <field name="remuneration_maitre" optional="show" sum="Total Rémunération" />
+
+                <field name="state" optional="show" decoration-success=" state == 'en_cours' "
+                    decoration-info="state == 'pas_encore'" decoration-danger="state == 'termine'"
+                    widget="badge" />
+
             </tree>
         </field>
     </record>
@@ -56,13 +96,12 @@
                             <field name="list_mois_ids">
                                 <tree>
                                     <field name="mois" />
-                                    <field name="montant" widget="monetary" />
+                                    <field name="montant" string="Montant de l'apprenti" widget="monetary" />
                                     <field name="remuneration_maitre" widget="monetary" />
                                     <button name="action_open_wizard"
                                         type="object"
                                         string="modifier"
                                         class="btn-primary" />
-                                    
                                 </tree>
                             </field>
                         </page>
