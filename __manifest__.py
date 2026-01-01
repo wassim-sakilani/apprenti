@@ -4,8 +4,7 @@
     "sequence": -100,
     "summary": "Un module pour la gestion des apprentis en Algerian Desalination Company (ADC) ",
     "author": "Sakilani Mohamed Wassim",
-    "maintainer": "Sakilani Mohamed Wassim",
-    "website": "mailto:wassim.sakilani@gmail.com",
+    "website": "https://github.com/wassim-sakilani/Apprentis.git",
     "depends": ["mail","hr","report_xlsx"],                
     "data": [
         "security/ir.model.access.csv",
