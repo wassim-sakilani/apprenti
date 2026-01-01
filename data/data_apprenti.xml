@@ -7,7 +7,7 @@
         <record id="seq_apprenti" model="ir.sequence">
             <field name="name">Apprenti Sequencer</field>
             <field name="code">apprenti</field>
-            <field name="prefix">AP%(year)s</field>
+            <field name="prefix">AP/%(year)s/</field>
             <field name="padding">3</field>
             <field name="use_date_range">True</field>
             <field name="company_id" eval="False" />

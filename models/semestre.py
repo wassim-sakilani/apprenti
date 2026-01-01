@@ -11,6 +11,9 @@ class Semestre(models.Model):
     _description = "Semestre"
 
     apprenti_id = fields.Many2one(comodel_name="apprenti",string="Apprenti",required=True,ondelete="cascade")
+
+    nom_prenom = fields.Char(string= "Nom et Prenom" , compute="_compute_nom_prenom", store=True,readonly=True )
+
     semestre_type = fields.Selection([
         ('s1','S1'),
         ('s2','S2'),
@@ -18,7 +21,7 @@ class Semestre(models.Model):
         ('s4','S4'),
         ('s5','S5'),
         ('s6','S6')
-    ],required=True)
+    ],required=True,tracking=True)
 
     SEMESTRE_RATES = {
         's1': 0.2,
@@ -29,21 +32,21 @@ class Semestre(models.Model):
         's6': 0.8,
     }
 
-    annee_scolaire = fields.Char(string="Année Scolaire",required=True,help="Format: YYYY/YYYY (ex: 2024/2025)")
+    annee_scolaire = fields.Char(string="Année Scolaire",required=True,help="Format: YYYY/YYYY (ex: 2024/2025)",tracking=True)
 
-    debut_semestre = fields.Date(string="Debut de Semestre",required=True)
-    fin_semestre = fields.Date(string="Fin de Semestre",required=True)
+    debut_semestre = fields.Date(string="Debut de Semestre",required=True,tracking=True)
+    fin_semestre = fields.Date(string="Fin de Semestre",required=True,tracking=True)
 
     state = fields.Selection([
         ('pas_encore', 'Ouvert'),
         ('en_cours', 'En Cours'),
         ('termine', 'Terminé')
-    ], string="Etat" ,compute="calcul_etat", readonly=True)
+    ], string="Etat" ,compute="calcul_etat",store=True, readonly=True,tracking=True)
 
-    certificat_scolaire = fields.Binary(string="Certificat Scolaire")
-    remuneration_maitre = fields.Integer(string="Rémunération maitre d'apprentissage",required=True)
+    certificat_scolaire = fields.Binary(string="Certificat Scolaire",tracking=True)
+    remuneration_maitre = fields.Integer(string="Rémunération maitre d'apprentissage",required=True,tracking=True)
 
-    montant_semestre = fields.Integer(string="Montant de cette semestre" , compute="calcul_montant" , readonly=True)
+    montant_semestre = fields.Integer(string="Montant de cette semestre" , compute="calcul_montant" , readonly=True,tracking=True)
     #montant_mois = fields.Integer(string="Montant de cette mois" , compute="calcul_montant" , readonly=True)
     list_mois_ids = fields.One2many(comodel_name="semestre.mois",inverse_name="semestre_id",string="Mois du semestre",readonly=True)
 
@@ -61,10 +64,55 @@ class Semestre(models.Model):
             elif today > rec.fin_semestre  :
                 rec.state = 'termine'
 
+    @api.constrains('debut_semestre', 'fin_semestre', 'apprenti_id', 'semestre_type')
+    def check_chronologie_semestres(self):
+        
+        sem_order = ['s1', 's2', 's3', 's4', 's5', 's6']
+        
+        for rec in self:
+            if not rec.apprenti_id or not rec.semestre_type or not rec.debut_semestre or not rec.fin_semestre:
+                continue
+
+            overlap = self.search([
+                ('apprenti_id', '=', rec.apprenti_id.id),
+                ('id', '!=', rec.id), 
+                ('debut_semestre', '<=', rec.fin_semestre),
+                ('fin_semestre', '>=', rec.debut_semestre),
+            ])
+            if overlap:
+                raise ValidationError(f"il ya un conflict avec semestre{overlap[0].semestre_type}.")
+
+            try:
+                current_idx = sem_order.index(rec.semestre_type)
+            except ValueError:
+                continue 
+
+            previous_types = sem_order[:current_idx]
+            if previous_types:
+                prev_recs = self.search([
+                    ('apprenti_id', '=', rec.apprenti_id.id),
+                    ('semestre_type', 'in', previous_types),
+                    ('id', '!=', rec.id)
+                ])
+                for prev in prev_recs:
+                    if rec.debut_semestre <= prev.fin_semestre:
+                         raise ValidationError(f"error in order : semestre{rec.semestre_type} Cela doit commencer après la date de fin du semestre {prev.semestre_type} ({prev.fin_semestre}).")
+
+
+
+
+
+    #methode pour remplir le nom et le prénom
+    @api.depends('apprenti_id.nom', 'apprenti_id.prenom')
+    def _compute_nom_prenom(self):
+        for rec in self:
+            if rec.apprenti_id:
+                rec.nom_prenom = f"{rec.apprenti_id.nom} {rec.apprenti_id.prenom}"
+            else:
+                rec.nom_prenom = False
     @api.model
     def create(self, vals):
         record = super(Semestre, self).create(vals)
-        
         record.calcul_mois()
         return record
     

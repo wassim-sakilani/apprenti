@@ -15,45 +15,45 @@ class Apprenti(models.Model):
     matricule = fields.Char(string="Matricule" , readonly=True
                             ,copy=False,default=lambda self:_('Nouveau')) 
     #Numéro de Contrat
-    num_contrat = fields.Integer(string="Numéro de Contrat",required=True)
-    nom = fields.Char(string="Nom", required=True)
-    prenom = fields.Char(string="Prénom", required=True)
+    num_contrat = fields.Integer(string="Numéro de Contrat",required=True ,tracking=True )
+    nom = fields.Char(string="Nom", required=True,tracking=True)
+    prenom = fields.Char(string="Prénom", required=True,tracking=True)
     #Date de naissance 
-    date_naiss = fields.Date(string="Date de naissance ",required=True)
+    date_naiss = fields.Date(string="Date de naissance ",required=True,tracking=True)
     #Lieu de naissance 
-    lieu_naiss = fields.Char(string="Lieu de naissance",required=True)
-    telephone = fields.Char(string="Téléphone",required=True)
-    email = fields.Char(string="Email",required=True)
-    adress = fields.Char(string="Adress",required=True)
+    lieu_naiss = fields.Char(string="Lieu de naissance",required=True,tracking=True)
+    telephone = fields.Char(string="Téléphone",required=True,tracking=True)
+    email = fields.Char(string="Email",required=True,tracking=True)
+    adress = fields.Char(string="Adress",required=True,tracking=True)
     photo = fields.Image(
-    string="Photo",max_width=1024,max_height=1024)
-    speciality = fields.Char(string="Spécialité")
+    string="Photo",max_width=1024,max_height=1024,tracking=True)
+    speciality = fields.Char(string="Spécialité",tracking=True)
     # Structure : réference de structure
-    structure_id = fields.Many2one(comodel_name="structure",string="Structure",required=True)
+    structure_id = fields.Many2one(comodel_name="structure",string="Structure",required=True,tracking=True)
     # departement : réference de departement
-    department_id = fields.Many2one(comodel_name="hr.department",string="Departement",required=True)
+    department_id = fields.Many2one(comodel_name="hr.department",string="Departement",required=True,tracking=True)
     # station : réference de station
-    station_id = fields.Many2one(comodel_name="station",string="Station")
+    station_id = fields.Many2one(comodel_name="station",string="Station",tracking=True)
     # etablissement : réference de etablissement
-    etablissement_id = fields.Many2one(comodel_name="etablissement",string="Etablissement",required=True)
+    etablissement_id = fields.Many2one(comodel_name="etablissement",string="Etablissement",required=True,tracking=True)
     # Nom maitre d'apprentisage: réference de l'employe
-    maitre_id = fields.Many2one(comodel_name="hr.employee",string="Maitre D'apprentisage",required=True)
+    maitre_id = fields.Many2one(comodel_name="hr.employee",string="Maitre D'apprentisage",required=True,tracking=True)
     #L'etat de l'apprenti
     state = fields.Selection([
         ('pas_encore', 'Ouvert'),
         ('en_cours', 'En Cours'),
         ('termine', 'Terminé')
-    ], string="Etat" ,compute="calcul_etat", store=True, readonly=True)
+    ], string="Etat" ,compute="calcul_etat", store=True, readonly=True,tracking=True)
     #Début de l'apprentisage
-    debut_apprendre = fields.Date(string="Début de l'apprentisage" ,required=True)
+    debut_apprendre = fields.Date(string="Début de l'apprentisage" ,required=True,tracking=True)
     #Fin de l'apprentisage
-    fin_apprendre = fields.Date(string="Fin de l'apprentisage" ,required=True)
+    fin_apprendre = fields.Date(string="Fin de l'apprentisage" ,required=True,tracking=True)
     #PV d'installation
-    pv_installation = fields.Binary(string="PV d'installation")
+    pv_installation = fields.Binary(string="PV d'installation",tracking=True)
     #Contrat
-    contrat = fields.Binary(string="Contrat")
+    contrat = fields.Binary(string="Contrat",tracking=True)
 
-    semestre_ids = fields.One2many(comodel_name="semestre",inverse_name="apprenti_id",string="Semestres",readonly=True)
+    semestre_ids = fields.One2many(comodel_name="semestre",inverse_name="apprenti_id",string="Semestres",readonly=True,tracking=True)
     semestre_display = fields.Char( string="Semestres",compute="_compute_semestre_display",store=False)
 
     #méthode pour calculer l'etat de l'apprenti
