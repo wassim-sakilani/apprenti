@@ -40,7 +40,7 @@
         <field name="name">semestre.tree</field>
         <field name="model">semestre</field>
         <field name="arch" type="xml">
-            <tree sample="1" multi_edit="1">
+            <tree sample="1" multi_edit="1" default_order="semestre_type asc">
                 <field name="apprenti_id" optional="hide" />
                 <field name="nom_prenom" optional="show" />
                 <field name="semestre_type" optional="show" />

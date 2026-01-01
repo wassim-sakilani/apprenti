@@ -13,7 +13,7 @@ class Semestre(models.Model):
     apprenti_id = fields.Many2one(comodel_name="apprenti",string="Apprenti",required=True,ondelete="cascade")
 
     nom_prenom = fields.Char(string= "Nom et Prenom" , compute="_compute_nom_prenom", store=True,readonly=True )
-
+    
     semestre_type = fields.Selection([
         ('s1','S1'),
         ('s2','S2'),
@@ -63,44 +63,6 @@ class Semestre(models.Model):
                 rec.state = 'en_cours'
             elif today > rec.fin_semestre  :
                 rec.state = 'termine'
-
-    @api.constrains('debut_semestre', 'fin_semestre', 'apprenti_id', 'semestre_type')
-    def check_chronologie_semestres(self):
-        
-        sem_order = ['s1', 's2', 's3', 's4', 's5', 's6']
-        
-        for rec in self:
-            if not rec.apprenti_id or not rec.semestre_type or not rec.debut_semestre or not rec.fin_semestre:
-                continue
-
-            overlap = self.search([
-                ('apprenti_id', '=', rec.apprenti_id.id),
-                ('id', '!=', rec.id), 
-                ('debut_semestre', '<=', rec.fin_semestre),
-                ('fin_semestre', '>=', rec.debut_semestre),
-            ])
-            if overlap:
-                raise ValidationError(f"il ya un conflict avec semestre{overlap[0].semestre_type}.")
-
-            try:
-                current_idx = sem_order.index(rec.semestre_type)
-            except ValueError:
-                continue 
-
-            previous_types = sem_order[:current_idx]
-            if previous_types:
-                prev_recs = self.search([
-                    ('apprenti_id', '=', rec.apprenti_id.id),
-                    ('semestre_type', 'in', previous_types),
-                    ('id', '!=', rec.id)
-                ])
-                for prev in prev_recs:
-                    if rec.debut_semestre <= prev.fin_semestre:
-                         raise ValidationError(f"error in order : semestre{rec.semestre_type} Cela doit commencer après la date de fin du semestre {prev.semestre_type} ({prev.fin_semestre}).")
-
-
-
-
 
     #methode pour remplir le nom et le prénom
     @api.depends('apprenti_id.nom', 'apprenti_id.prenom')
@@ -235,6 +197,44 @@ class Semestre(models.Model):
                         f"doit être entre le 01/09/{year1} et le 31/08/{year2} "
                         f"pour l'année scolaire {rec.annee_scolaire}."
                     )
+                if rec.debut_semestre < rec.apprenti_id.debut_apprendre or rec.fin_semestre > rec.apprenti_id.fin_apprendre :
+                    raise ValidationError("La date de cette semestre doit étre inclu dans la periode d'aaprentissage de l'apprenti")
+    
+    #methode pour vérifier l'ordre de semestres
+    @api.constrains('debut_semestre', 'fin_semestre', 'apprenti_id', 'semestre_type')
+    def check_chronologie_semestres(self):
+        
+        sem_order = ['s1', 's2', 's3', 's4', 's5', 's6']
+        
+        for rec in self:
+            if not rec.apprenti_id or not rec.semestre_type or not rec.debut_semestre or not rec.fin_semestre:
+                continue
+
+            overlap = self.search([
+                ('apprenti_id', '=', rec.apprenti_id.id),
+                ('id', '!=', rec.id), 
+                ('debut_semestre', '<=', rec.fin_semestre),
+                ('fin_semestre', '>=', rec.debut_semestre),
+            ])
+            if overlap:
+                raise ValidationError(f"il ya un conflict avec semestre{overlap[0].semestre_type}.")
+
+            try:
+                current_idx = sem_order.index(rec.semestre_type)
+            except ValueError:
+                continue 
+
+            previous_types = sem_order[:current_idx]
+            if previous_types:
+                prev_recs = self.search([
+                    ('apprenti_id', '=', rec.apprenti_id.id),
+                    ('semestre_type', 'in', previous_types),
+                    ('id', '!=', rec.id)
+                ])
+                for prev in prev_recs:
+                    if rec.debut_semestre <= prev.fin_semestre:
+                         raise ValidationError(f"error in order : semestre{rec.semestre_type} Cela doit commencer après la date de fin du semestre {prev.semestre_type} ({prev.fin_semestre}).")
+
 
 ########################################################################################
 #   This module represents the months in a semester,                                   #
