@@ -29,6 +29,8 @@
 
                     <filter name="annee_scolaire" string="Année Scolaire"
                         context="{'group_by': 'annee_scolaire'}" />
+                    <filter name="by_department" string="Department"
+                        context="{'group_by': 'department_id'}" />
                 </group>
 
             </search>

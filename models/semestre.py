@@ -11,7 +11,7 @@ class Semestre(models.Model):
     _description = "Semestre"
 
     apprenti_id = fields.Many2one(comodel_name="apprenti",string="Apprenti",required=True,ondelete="cascade")
-
+    department_id = fields.Many2one('hr.department', readonly=True, related='apprenti_id.department_id',store=True)
     nom_prenom = fields.Char(string= "Nom et Prenom" , compute="_compute_nom_prenom", store=True,readonly=True )
     
     semestre_type = fields.Selection([
@@ -22,15 +22,6 @@ class Semestre(models.Model):
         ('s5','S5'),
         ('s6','S6')
     ],required=True,tracking=True)
-
-    SEMESTRE_RATES = {
-        's1': 0.2,
-        's2': 0.3,
-        's3': 0.5,
-        's4': 0.5,
-        's5': 0.6,
-        's6': 0.8,
-    }
 
     annee_scolaire = fields.Char(string="Année Scolaire",required=True,help="Format: YYYY/YYYY (ex: 2024/2025)",tracking=True)
 
@@ -46,7 +37,7 @@ class Semestre(models.Model):
     certificat_scolaire = fields.Binary(string="Certificat Scolaire",tracking=True)
     remuneration_maitre = fields.Integer(string="Rémunération maitre d'apprentissage",required=True,tracking=True)
 
-    montant_semestre = fields.Integer(string="Montant de cette semestre" , compute="calcul_montant" , readonly=True,tracking=True)
+    montant_semestre = fields.Integer(string="Montant de cette semestre" , compute="calcul_montant" ,store=True, readonly=True,tracking=True)
     #montant_mois = fields.Integer(string="Montant de cette mois" , compute="calcul_montant" , readonly=True)
     list_mois_ids = fields.One2many(comodel_name="semestre.mois",inverse_name="semestre_id",string="Mois du semestre",readonly=True)
 
@@ -80,9 +71,11 @@ class Semestre(models.Model):
     
     def write(self, vals):
         res = super(Semestre, self).write(vals)
-        if 'debut_semestre' in vals or 'fin_semestre' in vals or 'semestre_type' in vals:
+        if 'debut_semestre' in vals or 'fin_semestre' in vals or 'semestre_type' in vals :
             self.calcul_montant() 
             self.calcul_mois()
+        elif 'remuneration_maitre' in vals :
+            self.list_mois_ids.write({'remuneration_maitre': self.remuneration_maitre})
         return res
 
     #methode pour calculer le montant mensuelle
@@ -90,16 +83,23 @@ class Semestre(models.Model):
     def calcul_montant(self):
         smig_param = int(self.env['ir.config_parameter'].sudo().get_param('apprenti.smig', default=20000))
         smig =float(smig_param)
+        default_rates = {
+        's1': 0.2, 's2': 0.3, 's3': 0.5,
+        's4': 0.5, 's5': 0.6, 's6': 0.8
+        }
         for rec in self:
             rec.montant_semestre = 0
             if rec.semestre_type:
-                percentage = self.SEMESTRE_RATES.get(rec.semestre_type, 0.0)
+                param_name = f'apprenti.rate_{rec.semestre_type}'
+                fallback_rate = default_rates.get(rec.semestre_type, 0.0)
+                percentage = float(self.env['ir.config_parameter'].sudo().get_param(param_name, default=fallback_rate))
                 rec.montant_semestre = percentage * smig
             else:
                 rec.montant_semestre = 0
 
 
     #methode pour calculer les mois dans un semestre
+    
     def calcul_mois(self):
         for rec in self:
             rec.list_mois_ids.unlink()

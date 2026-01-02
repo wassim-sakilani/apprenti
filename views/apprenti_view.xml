@@ -131,10 +131,6 @@
                 <field name="matricule" optional="show" />
                 <field name="prenom" optional="show" />
                 <field name="nom" optional="show" />
-                <field name="state" optional="show" decoration-info="state == 'pas_encore'"
-                    decoration-success=" state == 'en_cours' "
-                    decoration-danger="state == 'termine'"
-                    widget="badge" />
                 <field name="date_naiss" optional="hide" />
                 <field name="lieu_naiss" optional="hide" />
                 <field name="telephone" optional="hide" widget="phone" />
@@ -148,6 +144,10 @@
                 <field name="semestre_display" optional="hide" />
                 <field name="debut_apprendre" optional="show" />
                 <field name="fin_apprendre" optional="show" />
+                <field name="state" optional="show" decoration-info="state == 'pas_encore'"
+                    decoration-success=" state == 'en_cours' "
+                    decoration-danger="state == 'termine'"
+                    widget="badge" />
                 <field name="speciality" optional="hide" />
             </tree>
         </field>
