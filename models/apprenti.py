@@ -55,6 +55,12 @@ class Apprenti(models.Model):
 
     semestre_ids = fields.One2many(comodel_name="semestre",inverse_name="apprenti_id",string="Semestres",readonly=True,tracking=True)
     semestre_display = fields.Char( string="Semestres",compute="_compute_semestre_display",store=False)
+    semestre_count = fields.Integer(string="Semestre Count" , compute="_comput_semestre_count")
+
+    def _comput_semestre_count(self):
+        for rec in self:
+            semestre_count = self.env['semestre'].search_count([('apprenti_id','=',self.id)])
+            rec.semestre_count = semestre_count
 
     #méthode pour calculer l'etat de l'apprenti
     @api.depends('debut_apprendre', 'fin_apprendre')

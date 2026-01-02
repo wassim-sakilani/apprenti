@@ -36,6 +36,10 @@
                         context="{'group_by': 'structure_id'}" />
                     <filter name="department_id" string="Department"
                         context="{'group_by': 'department_id'}" />
+
+                    <filter name="maitre_id" string="Maitre"
+                        context="{'group_by': 'maitre_id'}" />
+                        
                     <filter name="station_id" string="Station" context="{'group_by': 'station_id'}" />
                 </group>
                 <searchpanel>
@@ -173,6 +177,7 @@
                         <button name="action_voir_semestres" type="object"
                             class="oe_stat_button" icon="fa-list">
                             <div class="o_stat_info">
+                                <field name="semestre_count" class = "o_stat_value" />
                                 <span class="o_stat_text">voir Semestres</span>
                             </div>
                         </button>
