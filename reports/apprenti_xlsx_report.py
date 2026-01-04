@@ -117,7 +117,6 @@ class ApprentiXlsx(models.AbstractModel):
         row = 1
         for obj in apprentis:
             
-
             full_name = f"{obj.nom} {obj.prenom}"
             semestre_info = apprenti_semestre_map.get(obj.id, {})
             semestre_type = semestre_info.get('semestre_type',"")
@@ -143,11 +142,15 @@ class ApprentiXlsx(models.AbstractModel):
             sheet.write(row, 12, obj.maitre_id.name if obj.maitre_id else "", text_format) # M
             sheet.write(row, 13,remuneration_maitre, currency_format) # N
             row += 1
-
-        
-        sheet.write(row, 11,sum_montant_semestre, currency_format_sum)
-        sheet.write(row, 13,sum_remuneration_maitre, currency_format_sum)
+        sheet.set_row(row, 20)
+        sheet.merge_range(row, 0, row, 10, '', header_format)
+        sheet.write(row,11,sum_montant_semestre, currency_format_sum)
+        sheet.write(row,12,'', header_format)
+        sheet.write(row,13,sum_remuneration_maitre, currency_format_sum)
         row += 1
+        sheet.set_row(row, 20)
+        sheet.merge_range(row, 0, row, 10, '', header_format)
         total = sum_remuneration_maitre+sum_montant_semestre
-        sheet.write(row, 13,total, currency_format_sum)
+        sheet.merge_range(row, 11, row, 13,total, currency_format_sum)
+        
 
