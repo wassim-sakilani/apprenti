@@ -105,9 +105,13 @@ class Apprenti(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Voir Semestres',
             'res_model': 'semestre',
-            'view_mode': 'tree',
+            'view_mode': 'tree,form',
             'target': 'current',
             'domain': [('apprenti_id', '=', self.id)],
+            'context': {
+                        'default_apprenti_id': self.id,
+                        'apprenti_readonly': True,
+                        },     
         }
     
     def name_get(self):
