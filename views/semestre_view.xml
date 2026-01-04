@@ -31,6 +31,12 @@
                         context="{'group_by': 'annee_scolaire'}" />
                     <filter name="by_department" string="Department"
                         context="{'group_by': 'department_id'}" />
+                    <filter name="by_structure" string="Structure"
+                        context="{'group_by': 'structure_id'}" />
+                    <filter name="by_maitre" string="Maitre"
+                        context="{'group_by': 'maitre_id'}" />
+                    <filter name="by_apprenti" string="Apprenti"
+                        context="{'group_by': 'apprenti_id'}" />
                 </group>
 
             </search>

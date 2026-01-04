@@ -12,6 +12,8 @@ class Semestre(models.Model):
 
     apprenti_id = fields.Many2one(comodel_name="apprenti",string="Apprenti",required=True,ondelete="cascade")
     department_id = fields.Many2one('hr.department', readonly=True, related='apprenti_id.department_id',store=True)
+    structure_id = fields.Many2one("structure",readonly=True,related='apprenti_id.structure_id',store=True)
+    maitre_id = fields.Many2one("hr.employee",required=True,related='apprenti_id.maitre_id',store=True)
     nom_prenom = fields.Char(string= "Nom et Prenom" , compute="_compute_nom_prenom", store=True,readonly=True )
     
     semestre_type = fields.Selection([
