@@ -81,9 +81,10 @@ class Apprenti(models.Model):
     def _check_maitre_count(self):
         for rec in self:
 
-            count_maitre = rec.env['apprenti'].search_count([('maitre_id','=',rec.maitre_id.id),('id','!=', rec.id)])
-            if count_maitre > 2 :
-                raise UserError(_(f"{self.maitre_id.name} ne peut avoir que 2 apprentis."))
+            count_maitre = rec.env['apprenti'].search_count([('maitre_id','=',rec.maitre_id.id),('id','!=', rec.id)
+                                                             ,('state','=','en_cours')])
+            if count_maitre >= 2 :
+                raise ValidationError(_(f"Le maitre {rec.maitre_id.name} ne peut avoir que 2 apprentis ."))
         
     #Checking the professor belongs to department
     @api.constrains('maitre_id','department_id')
