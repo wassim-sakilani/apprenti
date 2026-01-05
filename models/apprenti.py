@@ -1,5 +1,6 @@
 from odoo import api, models, fields,_
 from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError
 from datetime import date
 class Apprenti(models.Model):
     _name = "apprenti"
@@ -61,7 +62,38 @@ class Apprenti(models.Model):
         for rec in self:
             semestre_count = self.env['semestre'].search_count([('apprenti_id','=',self.id)])
             rec.semestre_count = semestre_count
+    @api.onchange('department_id')
+    def _onchange_department(self):
+        if self.department_id:
+            return {
+                'domain': {
+                    'maitre_id': [('department_id', '=', self.department_id.id)]
+                }
+            }
+        else:
+            return {
+                'domain': {
+                    'maitre_id': []
+                }
+            }
+    #Check the number of apprentices the master has.
+    @api.constrains('maitre_id')
+    def _check_maitre_count(self):
+        for rec in self:
 
+            count_maitre = rec.env['apprenti'].search_count([('maitre_id','=',rec.maitre_id.id),('id','!=', rec.id)])
+            if count_maitre > 2 :
+                raise UserError(_(f"{self.maitre_id.name} ne peut avoir que 2 apprentis."))
+        
+    #Checking the professor belongs to department
+    @api.constrains('maitre_id','department_id')
+    def check_maitre_department(self):
+        for rec in self:
+            if rec.maitre_id and rec.department_id:
+                    if rec.maitre_id.department_id != rec.department_id:
+                        raise ValidationError(_(
+                            f"Le maitre {rec.maitre_id.name} n'appartient pas au département {rec.department_id.name}."
+                        ))
     #méthode pour calculer l'etat de l'apprenti
     @api.depends('debut_apprendre', 'fin_apprendre')
     def calcul_etat(self):
