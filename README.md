@@ -1,11 +1,6 @@
 
-# Apprenti
-Apprentices Module
-=======
-# 🎓 Apprenticeship Management Module for Odoo
-=======
+
 #  Apprenticeship Management Module for Odoo
->>>>>>> 0376108 (docs: add website info to manifest and update README)
 
 ![Odoo Version](https://img.shields.io/badge/Odoo-14.0%2B-purple?style=flat-square)
 ![License](https://img.shields.io/badge/license-LGPL--3-blue?style=flat-square)
@@ -46,7 +41,7 @@ This module is essential for HR departments dealing with vocational training con
 
 1. Clone this repository into your Odoo addons path:
    ```bash
-   git clone [https://github.com/wassim-sakilani/Apprentis.git](https://github.com/wassim-sakilani/Apprentis.git)
+   git clone https://github.com/wassim-sakilani/Apprentis.git
 
 2. Update your Odoo configuration file (odoo.conf) to include the module path.
 
