@@ -20,6 +20,7 @@
                 <filter name="state_en_cours" string="En Cours"
                     domain="[('state', '=', 'en_cours')]" />
                 <filter name="state_termine" string="Terminé" domain="[('state', '=', 'termine')]" />
+                <filter name="state_resilie" string="Resilié" domain="[('state', '=', 'resilie')]" />
 
                 <!-- trier -->
                 <group expand="1" string="Group By">
@@ -86,7 +87,7 @@
                     </div>
                     <group>
                         <group string="Information de semestre">
-                            <field name="apprenti_id"
+                            <field name="apprenti_id" options="{'no_create': True, 'no_create_edit': True}"
                                 readonly="context.get('apprenti_readonly', False)" />
                             <field name="semestre_type" />
                             <field name="annee_scolaire" placeholder="ex: 2024/2025" maxlength="9" />
@@ -106,10 +107,6 @@
                                     <field name="mois" />
                                     <field name="montant" string="Montant de l'apprenti" widget="monetary" />
                                     <field name="remuneration_maitre" widget="monetary" />
-                                    <button name="action_open_wizard"
-                                        type="object"
-                                        string="modifier"
-                                        class="btn-primary" />
                                 </tree>
                             </field>
                         </page>
