@@ -10,7 +10,7 @@ class Semestre(models.Model):
     _rec_name ="semestre_type"  
     _description = "Semestre"
 
-    apprenti_id = fields.Many2one(comodel_name="apprenti",string="Apprenti",required=True,ondelete="cascade")
+    apprenti_id = fields.Many2one(comodel_name="apprenti",string="Apprenti",required=True,ondelete="cascade",tracking=True)
     department_id = fields.Many2one('hr.department', readonly=True, related='apprenti_id.department_id',store=True)
     structure_id = fields.Many2one("hr.direction",readonly=True,related='apprenti_id.structure_id',store=True)
     maitre_id = fields.Many2one("hr.employee",readonly=True,related='apprenti_id.maitre_id',store=True)
@@ -33,7 +33,8 @@ class Semestre(models.Model):
     state = fields.Selection([
         ('pas_encore', 'Ouvert'),
         ('en_cours', 'En Cours'),
-        ('termine', 'Terminé')
+        ('termine', 'Terminé'),
+        ('resilie', 'Resilié')
     ], string="Etat" ,compute="calcul_etat",store=True, readonly=True,tracking=True)
 
     certificat_scolaire = fields.Binary(string="Certificat Scolaire",tracking=True)
@@ -48,6 +49,8 @@ class Semestre(models.Model):
     def calcul_etat(self):
         today = date.today()
         for rec in self:
+            if rec.state == 'resilie':
+                continue
             if not rec.debut_semestre or not rec.fin_semestre:
                 rec.state = False
             elif today < rec.debut_semestre : 
@@ -67,18 +70,26 @@ class Semestre(models.Model):
                 rec.nom_prenom = False
     @api.model
     def create(self, vals):
+        if vals.get('apprenti_id'):
+            apprenti = self.env['apprenti'].browse(vals['apprenti_id'])
+            if apprenti.state == 'resilie':
+                raise UserError(_("Impossible de créer un semestre pour un apprenti résilié."))
         record = super(Semestre, self).create(vals)
         record.calcul_mois()
         return record
     
     def write(self, vals):
-        res = super(Semestre, self).write(vals)
-        if 'debut_semestre' in vals or 'fin_semestre' in vals or 'semestre_type' in vals :
-            self.calcul_montant() 
-            self.calcul_mois()
-        elif 'remuneration_maitre' in vals :
-            self.list_mois_ids.write({'remuneration_maitre': self.remuneration_maitre})
-        return res
+        for rec in self:
+            if rec.state == 'resilie' :
+                raise UserError(_("Impossible de modifier les informations d'un apprenti résilié."))
+            
+            res = super(Semestre, rec).write(vals)
+            if 'debut_semestre' in vals or 'fin_semestre' in vals or 'semestre_type' in vals :
+                rec.calcul_montant() 
+                rec.calcul_mois()
+            elif 'remuneration_maitre' in vals :
+                rec.list_mois_ids.write({'remuneration_maitre': rec.remuneration_maitre})
+            return res
 
     #methode pour calculer le montant mensuelle
     @api.depends('semestre_type')
@@ -103,16 +114,21 @@ class Semestre(models.Model):
     #methode pour calculer les mois dans un semestre
     
     def calcul_mois(self):
+        mois_francais = {
+            1: 'Janvier', 2: 'Février', 3: 'Mars', 4: 'Avril',
+            5: 'Mai', 6: 'Juin', 7: 'Juillet', 8: 'Août',
+            9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Décembre'
+        }
         for rec in self:
             rec.list_mois_ids.unlink()
             if rec.debut_semestre and rec.fin_semestre :
                 start = rec.debut_semestre.replace(day=1)
                 end = rec.fin_semestre.replace(day=1)
                 mois_vals = []
-                while start <= end:
+                while start < end:
                     mois_vals.append({
                         'semestre_id': rec.id,
-                        'mois': start.strftime('%B'),
+                        'mois': mois_francais[start.month],
                         'montant': rec.montant_semestre,
                         'remuneration_maitre': rec.remuneration_maitre,
                     })
@@ -235,7 +251,7 @@ class Semestre(models.Model):
                 ])
                 for prev in prev_recs:
                     if rec.debut_semestre <= prev.fin_semestre:
-                         raise ValidationError(f"error in order : semestre{rec.semestre_type} Cela doit commencer après la date de fin du semestre {prev.semestre_type} ({prev.fin_semestre}).")
+                        raise ValidationError(f"error in order : semestre{rec.semestre_type} Cela doit commencer après la date de fin du semestre {prev.semestre_type} ({prev.fin_semestre}).")
 
 
 ########################################################################################
@@ -251,16 +267,3 @@ class SemestreMois(models.Model):
     mois = fields.Char(required=True)
     montant = fields.Float(required=True)
     remuneration_maitre = fields.Integer(required=True)
-
-    def action_open_wizard(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Modifier le mois',
-            'res_model': 'edit.montant.mois.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_semestre_mois_id': self.id,
-            }
-        }
