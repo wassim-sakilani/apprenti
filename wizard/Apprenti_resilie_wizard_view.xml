@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_apprenti_resilie_wizard" model="ir.ui.view">
+        <field name="name">apprenti.resilie.wizard.form</field>
+        <field name="model">apprenti.resilie.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Résiliation d'un Apprenti">
+                <group>
+                    <field name="date_resiliation"/>
+                    <field name="resiliation_document"/>
+                </group>
+                <footer>
+                    <button string="Résilier" type="object" name="action_resilier_apprenti" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="apprenti_resilie_action" model="ir.actions.act_window">
+        <field name="name">Résilier un Apprenti</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">apprenti.resilie.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        
+    </record>
+
+</odoo>
