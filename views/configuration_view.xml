@@ -89,7 +89,7 @@
 
     <menuitem
         id="configuration_menu"
-        name="Configuration"
+        name="Apprentis"
         action="configurations_action"
         parent="menu_apprentissage_root"
         sequence="12" />
